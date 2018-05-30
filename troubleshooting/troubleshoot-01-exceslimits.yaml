@@ -1,0 +1,132 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: hello-openshift
+    name: hello-openshift
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8888-tcp
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
+    selector:
+      app: hello-openshift
+      deploymentconfig: hello-openshift
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2018-05-25T08:45:59Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: hello-openshift
+    name: hello-openshift
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: openshift/hello-openshift
+      from:
+        kind: DockerImage
+        name: openshift/hello-openshift:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: hello-openshift
+    name: hello-openshift
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: hello-openshift
+      deploymentconfig: hello-openshift
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: hello-openshift
+          deploymentconfig: hello-openshift
+      spec:
+        containers:
+        - image: openshift/hello-openshift@sha256:aaea76ff622d2f8bcb32e538e7b3cd0ef6d291953f3e7c9f556c1ba5baf47e2e
+          imagePullPolicy: Always
+          name: hello-openshift
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8888
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "10"
+            requests:
+              cpu: "10"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - hello-openshift
+        from:
+          kind: ImageStreamTag
+          name: hello-openshift:latest
+          namespace: troubleshoot-01
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+kind: List
+metadata: {}
